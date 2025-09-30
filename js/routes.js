@@ -22,6 +22,10 @@ var routes = [
     url: './pages/about.html',
   },
   {
+    path: '/admin/',
+    url: './pages/admin.html',
+  },  
+  {
     path: '/form/',
     url: './pages/form.html',
   },

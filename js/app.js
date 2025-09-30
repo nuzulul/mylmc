@@ -13,7 +13,7 @@ var getParams = function (url) {
 };
 var params = getParams(window.location.href);
 
-var auth0redirect = "https://0f3gpy-ip-114-5-110-47.tunnelmole.net" //dev
+var auth0redirect = "https://uxmlva-ip-114-8-226-238.tunnelmole.net" //dev
 var isLocal = false;
 var userToken = ""
 
@@ -246,6 +246,8 @@ $('.logout-auth0').on('click',()=>{
 	logout()
 })
 
+$('.adminmenu').hide()
+
 
 
 /////////////////
@@ -291,6 +293,11 @@ const startUser = async (token) => {
 				}else if(data.type == "exist"){
 					let user = data.user
 					existUser(user)
+					let info = JSON.parse(user[4])
+					let usertype = info.usertype
+					if(usertype === 'admin'){
+						$('.adminmenu').show()
+					}
 				}
 			}
 			else if (status == "failed")
@@ -448,10 +455,14 @@ const existUser = async (user) => {
 
 const grupPage = async (grupid,namagrup) => {
 	
-		$('.gruparea').html(`<div class="biogrup float-left">${namagrup}</div><div class="float-right"><button class="button button-fill siswabaru" style="width:100px;margin-bottom:10px;">Tambah Siswa</button></div>`)
+		$('.gruparea').html(`<div class="biogrup float-left" ><span style="font-size:2em;font-weight:bold;">${namagrup}</span> <i style="cursor:pointer;font-size:1em;" class="f7-icons editnamagrup">pencil_circle</i></div><div class="float-right"><button class="button button-fill siswabaru" style="width:100px;margin-bottom:10px;">Tambah Siswa</button></div>`)
 		
 		$('.siswabaru').on('click',()=>{
 			siswaBaru(grupid)
+		})
+		
+		$('.editnamagrup').on('click',()=>{
+			editNamagrup(grupid,namagrup)
 		})
 
 		let mypreloader = app.dialog.preloader();
@@ -508,6 +519,133 @@ const grupPage = async (grupid,namagrup) => {
 		});	
 	
 }
+
+const editNamagrup = async (grupid,namagrup) => {
+	
+  let title = 'Edit Nama Grup'
+  var dialog = app.dialog.create({
+    title: title,
+    content:''////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      +'<div style="width:100%;height:50vh;overflow:auto;">'
+      +'  <div style="display:flex;flex-direction:column;align-items:center;justify-content: center;">'
+      +'  <div class="list no-hairlines-md" style="width:100%;">'
+      +'    <ul>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Nama Grup</div><div class="item-input-wrap">'
+      +'            <input type="text" id="namagrup" name="namagrup" placeholder="" value="'+namagrup+'">'
+      +'            </div></div>'
+      +'        </li>'
+      +'    </ul>'
+      +'  </div>'
+      +'  </div>'
+      +'</div>',//////////////////////////////////////////////////////////////////////////////////////////////////
+    closeByBackdropClick: false,
+    destroyOnClose: true,
+    verticalButtons: true,
+    on: {
+      opened: function () {
+		
+      }
+    },
+    buttons: [
+      {
+        text: 'Simpan',
+        close:true,
+        color: 'red',
+        onClick: function(dialog, e)
+          {
+				var newnamagrup = $('#namagrup').val();
+				saveNamagrup(grupid,newnamagrup)
+          }
+      },
+      {
+        text: 'Batal',
+        close:true,
+        color: 'gray',
+        onClick: function(dialog, e)
+          {
+
+          }
+      },
+    ]
+  });
+  dialog.open();
+}
+
+
+const saveNamagrup = async (grupid,newnamagrup) => {
+		let mypreloader = app.dialog.preloader();
+		
+		const input = {userToken,grupid,newnamagrup}
+		
+		const data = new URLSearchParams({
+            command: 'editnamagrup',
+			input : JSON.stringify(input)
+        })		
+		
+		fetch(apidataurl, {
+			body: data,
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+			method: "post",
+		})
+		.then(function (response) {
+			// The API call was successful!
+			if (response.ok) {
+				return response.text();
+			} else {
+				return Promise.reject(response);
+			}
+		}).then(function (data) {
+			// This is the data from our response
+			mypreloader.close();
+			console.log(data)
+			var status = JSON.parse(data).status;
+			var data = JSON.parse(data).data;
+			if (status == "success")
+			{
+				console.log(data);
+				mypreloader.close();
+				$('.mainarea').html('')
+				updateNamagrup(data)
+				
+			}
+			else if (status == "failed")
+			{
+			  app.dialog.alert(data,'Terjadi Kesalahan');
+			}
+			else
+			{
+			  app.dialog.alert(data,'Terjadi Kesalahan');
+			}		
+		}).catch(function (err) {
+			// There was an error
+			console.warn('Something went wrong.', err);
+			mypreloader.close();
+		});	
+}
+
+const updateNamagrup = async (data) => {
+	let grupid = data.grupid
+	let namagrup = data.newnamagrup
+	
+	window.datagrup[2] = namagrup
+	
+	
+	
+		let allgrup = JSON.parse(window.datauser[5])
+		let idx = allgrup.findIndex((item)=>item.grupid === grupid)
+		if(idx > -1){
+			allgrup[idx].namagrup = namagrup
+			let grup = JSON.stringify(allgrup)
+			window.datauser[5] = grup
+		}
+		
+	
+	
+	grupPage(grupid,namagrup)
+}
+
 
 const siswaBaru = async (grupid,edit,idx) => {
 	
