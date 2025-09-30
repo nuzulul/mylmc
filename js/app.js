@@ -726,6 +726,38 @@ const grupSave = async (mygrupid,siswaarr) => {
 
 const grupContent = async (data) => {
 	console.log(data)
+	let siswaarr = JSON.parse(data[3])
+	
+	let html = `<div class="data-table data-table-collapsible data-table-init siswa"><table><thead><tr><th>Nama</th><th>Jenis Kelamin</th><th>Tempat Tanggal Lahir</th><th>Nomer HP</th><th>Alamat Asal</th><th>Alamat Domisili</th><th>Lulusan SMA</th><th>Status Orang Tua</th><th>Program Studi</th><th>Fakultas</th><th>Tahun Masuk Unair</th><th>Level Pembinaan</th><th>Tahun Masuk Mulai Pembinaan / Mentoring</th><th>Materi yang Sudah Disampaikan</th><th>Kegiatan yang Sudah Diikuti</th><th>Keterangan</th><th>Catatan</th><th></th></tr></thead><tbody>`
+	
+	for (const siswa of siswaarr){
+		html += `
+			<tr>
+				<td data-collapsible-title="Nama">${safe(siswa.nama)}</td>
+				<td data-collapsible-title="Jenis Kelamin">${safe(siswa.jeniskelamin)}</td>
+				<td data-collapsible-title="Tempat Tanggal Lahir">${safe(siswa.tempattanggallahir)}</td>
+				<td data-collapsible-title="Nomer HP">${safe(siswa.nomerhp)}</td>
+				<td data-collapsible-title="Alamat Asal">${safe(siswa.alamatasal)}</td>
+				<td data-collapsible-title="Alamat Domisili">${safe(siswa.alamatdomisili)}</td>
+				<td data-collapsible-title="Lulusan SMA">${safe(siswa.lulusansma)}</td>
+				<td data-collapsible-title="Status Orang Tua">${safe(siswa.statusortu)}</td>
+				<td data-collapsible-title="Program Studi">${safe(siswa.programstudi)}</td>
+				<td data-collapsible-title="Fakultas">${safe(siswa.fakultas)}</td>
+				<td data-collapsible-title="Tahun Masuk Unair">${safe(siswa.tahunmasukunair)}</td>
+				<td data-collapsible-title="Level Pembinaan">${safe(siswa.levelpembinaan)}</td>
+				<td data-collapsible-title="Tahun Masuk Mulai Pembinaan / Mentoring">${safe(siswa.tahunmulaipembinaan)}</td>
+				<td data-collapsible-title="Materi yang Sudah Disampaikan">${safe(siswa.materi)}</td>
+				<td data-collapsible-title="Kegiatan yang Sudah Diikuti">${safe(siswa.kegiatan)}</td>
+				<td data-collapsible-title="Keterangan">${safe(siswa.keterangan)}</td>
+				<td data-collapsible-title="Catatan">${safe(siswa.catatan)}</td>
+			</tr>
+		`
+	}
+	
+	html += `</tbody></table></div>`
+	
+	$('.gruparea').append(html)
+	
 }
 
 
@@ -779,4 +811,27 @@ const callbackOkGrupbaru = async () => {
 			console.warn('Something went wrong.', err);
 			mypreloader.close();
 		});	
+}
+
+
+
+
+function escapehtmloldbrowser(s) {
+    let lookup = {
+        '&': "&amp;",
+        '"': "&quot;",
+        '\'': "&apos;",
+        '<': "&lt;",
+        '>': "&gt;"
+    };
+    return s.replace( /[&"'<>]/g, c => lookup[c] );
+}
+
+
+function safe(unsafe)
+{
+unsafe = String(unsafe);
+var data = escapehtmloldbrowser(unsafe);
+return data;
+
 }
