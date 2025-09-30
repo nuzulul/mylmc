@@ -29,3 +29,7 @@
   content: '';
   z-index: 6000;
 }
+
+.bigdialog{
+	min-width:50%;
+}

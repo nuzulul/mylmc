@@ -419,7 +419,7 @@ const existUser = async (user) => {
 	
 	for(const grup of gruparr){
 		html += `
-			<button class="button button-fill bukagrup bg-color-green" data-grupid="${grup.grupid}" style="width:100px;height:100px;margin-bottom:5px;margin-right:5px;"><span style="font-size:0.7em;display:none">${grup.grupid}</span>${grup.namagrup}</button>
+			<button class="button button-fill bukagrup bg-color-green" data-grupid="${grup.grupid}" data-namagrup="${grup.namagrup}" style="width:100px;height:100px;margin-bottom:5px;margin-right:5px;"><span style="font-size:0.7em;display:none">${grup.grupid}</span>${grup.namagrup}</button>
 	`
 	}
 	
@@ -435,19 +435,20 @@ const existUser = async (user) => {
 	
 	$('.bukagrup').on('click',async (e)=>{
 		let grupid = e.srcElement.dataset.grupid
+		let namagrup = e.srcElement.dataset.namagrup
 		console.log()
 		const res = await fetch("/pages/grup.html")      
 		var statushtml = await res.text()
 		app.views.main.router.navigate({url:"/dynamicLoad/", route:{content:statushtml}});
-		grupPage(grupid)
+		grupPage(grupid,namagrup)
 	})	
 	
 }
 
 
-const grupPage = async (grupid) => {
+const grupPage = async (grupid,namagrup) => {
 	
-		$('.gruparea').html('<button class="button button-fill siswabaru" style="width:100px;margin-bottom:10px;">Tambah Siswa</button>')
+		$('.gruparea').html(`<div class="biogrup float-left">${namagrup}</div><div class="float-right"><button class="button button-fill siswabaru" style="width:100px;margin-bottom:10px;">Tambah Siswa</button></div>`)
 		
 		$('.siswabaru').on('click',()=>{
 			siswaBaru(grupid)
@@ -514,6 +515,7 @@ const siswaBaru = async (grupid,edit,idx) => {
   let title = edit ? 'Edit Siswa' : 'Tambah Siswa'
   var dialog = app.dialog.create({
     title: title,
+	cssClass: 'bigdialog',
     content:''////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       +'<div style="width:100%;height:50vh;overflow:auto;">'
       +'  <div style="display:flex;flex-direction:column;align-items:center;justify-content: center;">'
@@ -540,11 +542,11 @@ const siswaBaru = async (grupid,edit,idx) => {
       +'            </div></div>'
       +'        </li>'
       +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Alamat Asal</div><div class="item-input-wrap">'
-      +'            <input type="textarea" id="alamatasal" name="alamatasal" placeholder="" value="">'
+      +'            <textarea type="textarea" id="alamatasal" name="alamatasal" placeholder="" value=""></textarea>'
       +'            </div></div>'
       +'        </li>'
       +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Alamat Domisili</div><div class="item-input-wrap">'
-      +'            <input type="textarea" id="alamatdomisili" name="alamatdomisili" placeholder="" value="">'
+      +'            <textarea type="textarea" id="alamatdomisili" name="alamatdomisili" placeholder="" value=""></textarea>'
       +'            </div></div>'
       +'        </li>'
       +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Lulusan SMA</div><div class="item-input-wrap">'
@@ -580,19 +582,19 @@ const siswaBaru = async (grupid,edit,idx) => {
       +'            </div></div>'
       +'        </li>'
       +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Materi yang Sudah Disampaikan</div><div class="item-input-wrap">'
-      +'            <input type="textarea" id="materi" name="materi" placeholder="" value="">'
+      +'            <textarea type="textarea" id="materi" name="materi" placeholder="" value=""></textarea>'
       +'            </div></div>'
       +'        </li>'
       +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Kegiatan yang Sudah Diikuti</div><div class="item-input-wrap">'
-      +'            <input type="textarea" id="kegiatan" name="kegiatan" placeholder="" value="">'
+      +'            <textarea type="textarea" id="kegiatan" name="kegiatan" placeholder="" value=""></textarea>'
       +'            </div></div>'
       +'        </li>'
       +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Keterangan</div><div class="item-input-wrap">'
-      +'            <input type="textarea" id="keterangan" name="keterangan" placeholder="" value="">'
+      +'            <textarea type="textarea" id="keterangan" name="keterangan" placeholder="" value=""></textarea>'
       +'            </div></div>'
       +'        </li>'
       +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Catatan</div><div class="item-input-wrap">'
-      +'            <input type="textarea" id="catatan" name="catatan" placeholder="" value="">'
+      +'            <textarea type="textarea" id="catatan" name="catatan" placeholder="" value=""></textarea>'
       +'            </div></div>'
       +'        </li>'
       +'    </ul>'
@@ -743,7 +745,7 @@ const grupContent = async (data) => {
 	console.log(data)
 	let siswaarr = JSON.parse(data[3])
 	
-	let html = `<div class="data-table data-table-collapsible data-table-init siswa"><table><thead><tr><th>Nama</th><th>Jenis Kelamin</th><th>Tempat Tanggal Lahir</th><th>Nomer HP</th><th>Alamat Asal</th><th>Alamat Domisili</th><th>Lulusan SMA</th><th>Status Orang Tua</th><th>Program Studi</th><th>Fakultas</th><th>Tahun Masuk Unair</th><th>Level Pembinaan</th><th>Tahun Masuk Mulai Pembinaan / Mentoring</th><th>Materi yang Sudah Disampaikan</th><th>Kegiatan yang Sudah Diikuti</th><th>Keterangan</th><th>Catatan</th><th></th></tr></thead><tbody>`
+	let html = `<div style="clear:both;" class="data-table data-table-collapsible data-table-init siswa"><table><thead><tr><th>Nama</th><th>Jenis Kelamin</th><th>Tempat Tanggal Lahir</th><th>Nomer HP</th><th>Alamat Asal</th><th>Alamat Domisili</th><th>Lulusan SMA</th><th>Status Orang Tua</th><th>Program Studi</th><th>Fakultas</th><th>Tahun Masuk Unair</th><th>Level Pembinaan</th><th>Tahun Masuk Mulai Pembinaan / Mentoring</th><th>Materi yang Sudah Disampaikan</th><th>Kegiatan yang Sudah Diikuti</th><th>Keterangan</th><th>Catatan</th><th></th></tr></thead><tbody>`
 	
 	for (var i=0;i<siswaarr.length;i++){
 		let siswa = siswaarr[i]
