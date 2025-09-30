@@ -13,7 +13,7 @@ var getParams = function (url) {
 };
 var params = getParams(window.location.href);
 
-var auth0redirect = "https://gk9caj-ip-114-5-242-132.tunnelmole.net" //dev
+var auth0redirect = "https://0f3gpy-ip-114-5-110-47.tunnelmole.net" //dev
 var isLocal = false;
 var userToken = ""
 
@@ -41,7 +41,7 @@ var $ = Dom7;
 
 var app = new Framework7({
   name: 'MyLMC', // App name
-  theme: 'auto', // Automatic theme detection
+  theme: 'auto', // Automatic theme detection 
   colors: {
     primary: '#007aff',
   },
@@ -289,7 +289,8 @@ const startUser = async (token) => {
 				if(data.type == "new"){
 					newUser()
 				}else if(data.type == "exist"){
-					existUser()
+					let user = data.user
+					existUser(user)
 				}
 			}
 			else if (status == "failed")
@@ -318,8 +319,464 @@ if(localStorage.hasOwnProperty('token')){
 
 /////////////////
 const newUser = async () => {
+	let html = `
+		<div class="block-title">Selamat Datang</div>
+		<div class="list list-strong-ios list-dividers-ios list-outline-ios">
+		  <ul>
+			<li>
+			  <div class="item-content item-input">
+				<div class="item-inner">
+				  <div class="item-title item-label">Masukkan invite code</div>
+				  <div class="item-input-wrap">
+					<input class="invite" type="text" placeholder="" />
+				  </div>
+				</div>
+			  </div>
+			</li>		  
+			</ul>
+		</div>
+		<button class="button button-fill submit" style="width:100px;">Submit</button>
+	`
+	
+	$('.mainarea').html(html)
+	
+	$('.submit').on('click',()=>{
+		let invite = $('.invite').val()
+		
+		if(invite !== "")
+		{
+			sendInvite(invite)
+		}
+	})
+}
+
+const sendInvite = async (invite) => {
+	
+		let mypreloader = app.dialog.preloader();
+		
+		const input = {userToken,invite}
+		
+		const data = new URLSearchParams({
+            command: 'invite',
+			input : JSON.stringify(input)
+        })		
+		
+		fetch(apidataurl, {
+			body: data,
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+			method: "post",
+		})
+		.then(function (response) {
+			// The API call was successful!
+			if (response.ok) {
+				return response.text();
+			} else {
+				return Promise.reject(response);
+			}
+		}).then(function (data) {
+			// This is the data from our response
+			mypreloader.close();
+			console.log(data)
+			var status = JSON.parse(data).status;
+			var data = JSON.parse(data).data;
+			if (status == "success")
+			{
+				console.log(data);
+				mypreloader.close();
+				$('.mainarea').html('')
+				existUser(data)
+			}
+			else if (status == "failed")
+			{
+			  app.dialog.alert(data,'Terjadi Kesalahan');
+			}
+			else
+			{
+			  app.dialog.alert(data,'Terjadi Kesalahan');
+			}		
+		}).catch(function (err) {
+			// There was an error
+			console.warn('Something went wrong.', err);
+			mypreloader.close();
+		});
 }
 
 /////////////////
-const existUser = async () => {
+const existUser = async (user) => {
+	
+	window.datauser = user
+	
+	let html = `
+		<div class="block-title">Selamat datang, ${user[2]}</div>
+	`
+	$('.mainarea').html(html)
+	
+	let gruparr = JSON.parse(user[5])
+	
+	html = ``
+	
+	for(const grup of gruparr){
+		html += `
+			<button class="button button-fill bukagrup bg-color-green" data-grupid="${grup.grupid}" style="width:100px;height:100px;margin-bottom:5px;margin-right:5px;"><span style="font-size:0.7em;display:none">${grup.grupid}</span>${grup.namagrup}</button>
+	`
+	}
+	
+	html += `
+		<button class="button button-fill grupbaru" style="width:100px;">Tambah Grup</button>
+	`
+	
+	$('.mainarea').append(html)
+
+	$('.grupbaru').on('click',()=>{
+		app.dialog.confirm('', 'Tambah grup baru?', callbackOkGrupbaru)
+	})
+	
+	$('.bukagrup').on('click',async (e)=>{
+		let grupid = e.srcElement.dataset.grupid
+		console.log()
+		const res = await fetch("/pages/grup.html")      
+		var statushtml = await res.text()
+		app.views.main.router.navigate({url:"/dynamicLoad/", route:{content:statushtml}});
+		grupPage(grupid)
+	})	
+	
+}
+
+
+const grupPage = async (grupid) => {
+	
+		$('.gruparea').html('<button class="button button-fill siswabaru" style="width:100px;">Tambah Siswa</button>')
+		
+		$('.siswabaru').on('click',()=>{
+			siswaBaru(grupid)
+		})
+
+		let mypreloader = app.dialog.preloader();
+		
+		const input = {userToken,grupid}
+		
+		const data = new URLSearchParams({
+            command: 'grupdata',
+			input : JSON.stringify(input)
+        })		
+		
+		fetch(apidataurl, {
+			body: data,
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+			method: "post",
+		})
+		.then(function (response) {
+			// The API call was successful!
+			if (response.ok) {
+				return response.text();
+			} else {
+				return Promise.reject(response);
+			}
+		}).then(function (data) {
+			// This is the data from our response
+			mypreloader.close();
+			console.log(data)
+			var status = JSON.parse(data).status;
+			var data = JSON.parse(data).data;
+			if (status == "success")
+			{
+				console.log(data);
+				mypreloader.close();
+				$('.mainarea').html('')
+				grupContent(data)
+				window.datatemp = data
+			}
+			else if (status == "failed")
+			{
+			  app.dialog.alert(data,'Terjadi Kesalahan');
+			  window.datatemp = ''
+			}
+			else
+			{
+			  app.dialog.alert(data,'Terjadi Kesalahan');
+			  window.datatemp = ''
+			}		
+		}).catch(function (err) {
+			// There was an error
+			console.warn('Something went wrong.', err);
+			mypreloader.close();
+		});	
+	
+}
+
+const siswaBaru = async (grupid,edit) => {
+	
+	let mygrupid = grupid
+  let title = edit ? 'Edit Siswa' : 'Tambah Siswa'
+  var dialog = app.dialog.create({
+    title: title,
+    content:''////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      +'<div style="width:100%;height:50vh;overflow:auto;">'
+      +'  <div style="display:flex;flex-direction:column;align-items:center;justify-content: center;">'
+      +'  <div class="list no-hairlines-md" style="width:100%;">'
+      +'    <ul>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Nama</div><div class="item-input-wrap">'
+      +'            <input type="text" id="nama" name="nama" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Jenis Kelamin</div><div class="item-input-wrap">'
+      +'                            <select id="jeniskelamin" name="jeniskelamin">'
+      +'                              <option value=""></option>'
+      +'                              <option value="Laki-Laki">Laki-Laki</option>'
+      +'                              <option value="Perempuan">Perempuan</option>'
+      +'                            </select>'
+      +'            </div></div>'
+      +'        </li>'	  
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Tempat Tanggal Lahir</div><div class="item-input-wrap">'
+      +'            <input type="text" id="tempattanggallahir" name="tempattanggallahir" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Nomer HP</div><div class="item-input-wrap">'
+      +'            <input type="text" id="nomerhp" name="nomerhp" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Alamat Asal</div><div class="item-input-wrap">'
+      +'            <input type="textarea" id="alamatasal" name="alamatasal" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Alamat Domisili</div><div class="item-input-wrap">'
+      +'            <input type="textarea" id="alamatdomisili" name="alamatdomisili" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Lulusan SMA</div><div class="item-input-wrap">'
+      +'            <input type="text" id="lulusansma" name="lulusansma" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Status Orang Tua</div><div class="item-input-wrap">'
+      +'                            <select id="statusortu" name="statusortu">'
+      +'                              <option value=""></option>'
+      +'                              <option value="Kader">Kader</option>'
+      +'                              <option value="Non Kader">Non Kader</option>'	  
+      +'                            </select>'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Program Studi</div><div class="item-input-wrap">'
+      +'            <input type="text" id="programstudi" name="programstudi" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Fakultas</div><div class="item-input-wrap">'
+      +'            <input type="text" id="fakultas" name="fakultas" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Tahun Masuk Unair</div><div class="item-input-wrap">'
+      +'            <input type="text" id="tahunmasukunair" name="tahunmasukunair" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Level Pembinaan</div><div class="item-input-wrap">'
+      +'            <input type="text" id="levelpembinaan" name="levelpembinaan" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Tahun Masuk Mulai Pembinaan / Mentoring</div><div class="item-input-wrap">'
+      +'            <input type="text" id="tahunmulaipembinaan" name="tahunmulaipembinaan" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Materi yang Sudah Disampaikan</div><div class="item-input-wrap">'
+      +'            <input type="textarea" id="materi" name="materi" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Kegiatan yang Sudah Diikuti</div><div class="item-input-wrap">'
+      +'            <input type="textarea" id="kegiatan" name="kegiatan" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Keterangan</div><div class="item-input-wrap">'
+      +'            <input type="textarea" id="keterangan" name="keterangan" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'        <li class="item-content item-input"><div class="item-inner"><div class="item-title item-label">Catatan</div><div class="item-input-wrap">'
+      +'            <input type="textarea" id="catatan" name="catatan" placeholder="" value="">'
+      +'            </div></div>'
+      +'        </li>'
+      +'    </ul>'
+      +'  </div>'
+      +'  </div>'
+      +'</div>',//////////////////////////////////////////////////////////////////////////////////////////////////
+    closeByBackdropClick: false,
+    destroyOnClose: true,
+    verticalButtons: true,
+    on: {
+      opened: function () {
+		
+		if(edit){
+			/*let arr = JSON.parse(bsmr)
+			let data = arr[parseInt(idx)]
+			$$('#namasekolah').val(safe(data.namasekolah))
+			$$('#alamatsekolah').val(safe(data.alamatsekolah))
+			$$('#nomorbsmr').val(safe(data.nomorbsmr))
+			$$('#tahunpendirianbsmr').val(safe(data.tahunpendirianbsmr))
+			$$('#jumlahanggotabsmr').val(safe(data.jumlahanggotabsmr))
+			$$('#picbsmr').val(safe(data.picbsmr))
+			$$('#piccabangid').val(safe(data.piccabangid))
+			$$('#namasekolah').attr('disabled','true')
+			*/
+		}
+		
+      }
+    },
+    buttons: [
+      {
+        text: 'Simpan',
+        close:true,
+        color: 'red',
+        onClick: function(dialog, e)
+          {
+				var nama = $('#nama').val();
+				var jeniskelamin = $('#jeniskelamin').val();
+				var tempattanggallahir = $('#tempattanggallahir').val();
+				var nomerhp = $('#nomerhp').val();
+				var alamatasal = $('#alamatasal').val();
+				var alamatdomisili = $('#alamatdomisili').val();
+				var lulusansma = $('#lulusansma').val();
+				var statusortu = $('#statusortu').val();
+				var programstudi = $('#programstudi').val();
+				var fakultas = $('#fakultas').val();
+				var tahunmasukunair = $('#tahunmasukunair').val();
+				var levelpembinaan = $('#levelpembinaan').val();
+				var tahunmulaipembinaan = $('#tahunmulaipembinaan').val();
+				var materi = $('#materi').val();
+				var kegiatan = $('#kegiatan').val();
+				var keterangan = $('#keterangan').val();
+				var catatan = $('#catatan').val();
+				
+				if(edit){
+					
+				}else{
+					let siswa = {nama,jeniskelamin,tempattanggallahir,nomerhp,alamatasal,alamatdomisili,lulusansma,statusortu,programstudi,fakultas,tahunmasukunair,levelpembinaan,tahunmulaipembinaan,materi,kegiatan,keterangan,catatan}
+					if (window.datatemp && window.datatemp !== '' && window.datatemp[1] === mygrupid){
+						let siswaarr = JSON.parse(datatemp[3])
+						siswaarr.push(siswa)
+						grupSave(mygrupid,JSON.stringify(siswaarr))
+					}
+				}
+          }
+      },
+      {
+        text: 'Batal',
+        close:true,
+        color: 'gray',
+        onClick: function(dialog, e)
+          {
+
+          }
+      },
+    ]
+  });
+  dialog.open();	
+	
+}
+
+const grupSave = async (mygrupid,siswaarr) => {
+		let mypreloader = app.dialog.preloader();
+		
+		const input = {userToken,grupid:mygrupid,siswaarr}
+		
+		const data = new URLSearchParams({
+            command: 'grupsave',
+			input : JSON.stringify(input)
+        })		
+		
+		fetch(apidataurl, {
+			body: data,
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+			method: "post",
+		})
+		.then(function (response) {
+			// The API call was successful!
+			if (response.ok) {
+				return response.text();
+			} else {
+				return Promise.reject(response);
+			}
+		}).then(function (data) {
+			// This is the data from our response
+			mypreloader.close();
+			console.log(data)
+			var status = JSON.parse(data).status;
+			var data = JSON.parse(data).data;
+			if (status == "success")
+			{
+				console.log(data);
+				mypreloader.close();
+				grupPage(data)
+			}
+			else if (status == "failed")
+			{
+			  app.dialog.alert(data,'Terjadi Kesalahan');
+			}
+			else
+			{
+			  app.dialog.alert(data,'Terjadi Kesalahan');
+			}		
+		}).catch(function (err) {
+			// There was an error
+			console.warn('Something went wrong.', err);
+			mypreloader.close();
+		});	
+}
+
+const grupContent = async (data) => {
+	console.log(data)
+}
+
+
+const callbackOkGrupbaru = async () => {
+		let mypreloader = app.dialog.preloader();
+		
+		const input = {userToken}
+		
+		const data = new URLSearchParams({
+            command: 'grupbaru',
+			input : JSON.stringify(input)
+        })		
+		
+		fetch(apidataurl, {
+			body: data,
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+			method: "post",
+		})
+		.then(function (response) {
+			// The API call was successful!
+			if (response.ok) {
+				return response.text();
+			} else {
+				return Promise.reject(response);
+			}
+		}).then(function (data) {
+			// This is the data from our response
+			mypreloader.close();
+			console.log(data)
+			var status = JSON.parse(data).status;
+			var data = JSON.parse(data).data;
+			if (status == "success")
+			{
+				console.log(data);
+				mypreloader.close();
+				$('.mainarea').html('')
+				existUser(data)
+			}
+			else if (status == "failed")
+			{
+			  app.dialog.alert(data,'Terjadi Kesalahan');
+			}
+			else
+			{
+			  app.dialog.alert(data,'Terjadi Kesalahan');
+			}		
+		}).catch(function (err) {
+			// There was an error
+			console.warn('Something went wrong.', err);
+			mypreloader.close();
+		});	
 }

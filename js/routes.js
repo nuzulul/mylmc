@@ -3,7 +3,20 @@ var routes = [
   {
     path: '/',
     url: './index.html',
+	on: {
+		pageAfterIn: function test (e, page) {
+			console.log('entry')
+			if (window.datauser){
+				existUser(window.datauser)
+			}
+		}
+	}
   },
+  {
+    name: "dynamicLoad",
+    path: "/dynamicLoad/"
+
+  },  
   {
     path: '/about/',
     url: './pages/about.html',
