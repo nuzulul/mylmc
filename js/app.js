@@ -447,7 +447,7 @@ const existUser = async (user) => {
 
 const grupPage = async (grupid) => {
 	
-		$('.gruparea').html('<button class="button button-fill siswabaru" style="width:100px;">Tambah Siswa</button>')
+		$('.gruparea').html('<button class="button button-fill siswabaru" style="width:100px;margin-bottom:10px;">Tambah Siswa</button>')
 		
 		$('.siswabaru').on('click',()=>{
 			siswaBaru(grupid)
@@ -488,17 +488,17 @@ const grupPage = async (grupid) => {
 				mypreloader.close();
 				$('.mainarea').html('')
 				grupContent(data)
-				window.datatemp = data
+				window.datagrup = data
 			}
 			else if (status == "failed")
 			{
 			  app.dialog.alert(data,'Terjadi Kesalahan');
-			  window.datatemp = ''
+			  window.datagrup = ''
 			}
 			else
 			{
 			  app.dialog.alert(data,'Terjadi Kesalahan');
-			  window.datatemp = ''
+			  window.datagrup = ''
 			}		
 		}).catch(function (err) {
 			// There was an error
@@ -508,7 +508,7 @@ const grupPage = async (grupid) => {
 	
 }
 
-const siswaBaru = async (grupid,edit) => {
+const siswaBaru = async (grupid,edit,idx) => {
 	
 	let mygrupid = grupid
   let title = edit ? 'Edit Siswa' : 'Tambah Siswa'
@@ -605,18 +605,29 @@ const siswaBaru = async (grupid,edit) => {
     on: {
       opened: function () {
 		
-		if(edit){
-			/*let arr = JSON.parse(bsmr)
-			let data = arr[parseInt(idx)]
-			$$('#namasekolah').val(safe(data.namasekolah))
-			$$('#alamatsekolah').val(safe(data.alamatsekolah))
-			$$('#nomorbsmr').val(safe(data.nomorbsmr))
-			$$('#tahunpendirianbsmr').val(safe(data.tahunpendirianbsmr))
-			$$('#jumlahanggotabsmr').val(safe(data.jumlahanggotabsmr))
-			$$('#picbsmr').val(safe(data.picbsmr))
-			$$('#piccabangid').val(safe(data.piccabangid))
-			$$('#namasekolah').attr('disabled','true')
-			*/
+		if(edit && window.datagrup && window.datagrup !== '' && window.datagrup[1] === mygrupid){
+			
+			let siswaarr = JSON.parse(window.datagrup[3])
+			let siswa = siswaarr[parseInt(idx)]
+			
+			$('#nama').val(safe(siswa.nama));
+			
+			$('#jeniskelamin').val(safe(siswa.jeniskelamin));
+			$('#tempattanggallahir').val(safe(siswa.tempattanggallahir));
+			$('#nomerhp').val(safe(siswa.nomerhp));
+			$('#alamatasal').val(safe(siswa.alamatasal));
+			$('#alamatdomisili').val(safe(siswa.alamatdomisili));
+			$('#lulusansma').val(safe(siswa.lulusansma));
+			$('#statusortu').val(safe(siswa.statusortu));
+			$('#programstudi').val(safe(siswa.programstudi));
+			$('#fakultas').val(safe(siswa.fakultas));
+			$('#tahunmasukunair').val(safe(siswa.tahunmasukunair));
+			$('#levelpembinaan').val(safe(siswa.levelpembinaan));
+			$('#tahunmulaipembinaan').val(safe(siswa.tahunmulaipembinaan));
+			$('#materi').val(safe(siswa.materi));
+			$('#kegiatan').val(safe(siswa.kegiatan));
+			$('#keterangan').val(safe(siswa.keterangan));
+			$('#catatan').val(safe(siswa.catatan));
 		}
 		
       }
@@ -648,10 +659,14 @@ const siswaBaru = async (grupid,edit) => {
 				
 				if(edit){
 					
+					let siswa = {nama,jeniskelamin,tempattanggallahir,nomerhp,alamatasal,alamatdomisili,lulusansma,statusortu,programstudi,fakultas,tahunmasukunair,levelpembinaan,tahunmulaipembinaan,materi,kegiatan,keterangan,catatan}
+					let siswaarr = JSON.parse(datagrup[3])
+					siswaarr[parseInt(idx)] = siswa
+					grupSave(mygrupid,JSON.stringify(siswaarr))
 				}else{
 					let siswa = {nama,jeniskelamin,tempattanggallahir,nomerhp,alamatasal,alamatdomisili,lulusansma,statusortu,programstudi,fakultas,tahunmasukunair,levelpembinaan,tahunmulaipembinaan,materi,kegiatan,keterangan,catatan}
-					if (window.datatemp && window.datatemp !== '' && window.datatemp[1] === mygrupid){
-						let siswaarr = JSON.parse(datatemp[3])
+					if (window.datagrup && window.datagrup !== '' && window.datagrup[1] === mygrupid){
+						let siswaarr = JSON.parse(window.datagrup[3])
 						siswaarr.push(siswa)
 						grupSave(mygrupid,JSON.stringify(siswaarr))
 					}
@@ -730,7 +745,8 @@ const grupContent = async (data) => {
 	
 	let html = `<div class="data-table data-table-collapsible data-table-init siswa"><table><thead><tr><th>Nama</th><th>Jenis Kelamin</th><th>Tempat Tanggal Lahir</th><th>Nomer HP</th><th>Alamat Asal</th><th>Alamat Domisili</th><th>Lulusan SMA</th><th>Status Orang Tua</th><th>Program Studi</th><th>Fakultas</th><th>Tahun Masuk Unair</th><th>Level Pembinaan</th><th>Tahun Masuk Mulai Pembinaan / Mentoring</th><th>Materi yang Sudah Disampaikan</th><th>Kegiatan yang Sudah Diikuti</th><th>Keterangan</th><th>Catatan</th><th></th></tr></thead><tbody>`
 	
-	for (const siswa of siswaarr){
+	for (var i=0;i<siswaarr.length;i++){
+		let siswa = siswaarr[i]
 		html += `
 			<tr>
 				<td data-collapsible-title="Nama">${safe(siswa.nama)}</td>
@@ -750,6 +766,7 @@ const grupContent = async (data) => {
 				<td data-collapsible-title="Kegiatan yang Sudah Diikuti">${safe(siswa.kegiatan)}</td>
 				<td data-collapsible-title="Keterangan">${safe(siswa.keterangan)}</td>
 				<td data-collapsible-title="Catatan">${safe(siswa.catatan)}</td>
+				<td data-collapsible-title=""><a class="button button-fill updatesiswa" data-idx="${i}">Edit</a></td></td>
 			</tr>
 		`
 	}
@@ -757,6 +774,12 @@ const grupContent = async (data) => {
 	html += `</tbody></table></div>`
 	
 	$('.gruparea').append(html)
+	
+	$('.updatesiswa').on('click',async (e)=>{
+		let idx = e.srcElement.dataset.idx
+		let grupid = data[1]
+		siswaBaru(grupid,true,idx)
+	})	
 	
 }
 
