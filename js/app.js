@@ -13,7 +13,7 @@ var getParams = function (url) {
 };
 var params = getParams(window.location.href);
 
-var auth0redirect = "https://uxmlva-ip-114-8-226-238.tunnelmole.net" //dev
+var auth0redirect = "https://dlw2hs-ip-114-8-226-238.tunnelmole.net" //dev
 var isLocal = false;
 var userToken = ""
 
@@ -862,7 +862,9 @@ const grupSave = async (mygrupid,siswaarr) => {
 			{
 				console.log(data);
 				mypreloader.close();
-				grupPage(data)
+				let grupid = data
+				let namagrup = window.datagrup[2]
+				grupPage(grupid,namagrup)
 			}
 			else if (status == "failed")
 			{
