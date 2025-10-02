@@ -13,7 +13,7 @@ var getParams = function (url) {
 };
 var params = getParams(window.location.href);
 
-var auth0redirect = "https://dlw2hs-ip-114-8-226-238.tunnelmole.net" //dev
+var auth0redirect = "https://hook8080.instatunnel.my" //dev
 var isLocal = false;
 var userToken = ""
 
@@ -426,12 +426,12 @@ const existUser = async (user) => {
 	
 	for(const grup of gruparr){
 		html += `
-			<button class="button button-fill bukagrup bg-color-green" data-grupid="${grup.grupid}" data-namagrup="${grup.namagrup}" style="width:100px;height:100px;margin-bottom:5px;margin-right:5px;"><span style="font-size:0.7em;display:none">${grup.grupid}</span>${grup.namagrup}</button>
+			<button class="button button-fill bukagrup bg-color-green float-left" data-grupid="${grup.grupid}" data-namagrup="${grup.namagrup}" style="width:100px;height:100px;margin-bottom:5px;margin-right:5px;"><span style="font-size:0.7em;display:none">${grup.grupid}</span>${grup.namagrup}</button>
 	`
 	}
 	
 	html += `
-		<button class="button button-fill grupbaru" style="width:100px;">Tambah Grup</button>
+		<button class="button button-fill grupbaru" style="width:auto;clear:both;">Tambah Grup Kelas</button>
 	`
 	
 	$('.mainarea').append(html)
@@ -455,7 +455,7 @@ const existUser = async (user) => {
 
 const grupPage = async (grupid,namagrup) => {
 	
-		$('.gruparea').html(`<div class="biogrup float-left" ><span style="font-size:2em;font-weight:bold;">${namagrup}</span> <i style="cursor:pointer;font-size:1em;" class="f7-icons editnamagrup">pencil_circle</i></div><div class="float-right"><button class="button button-fill siswabaru" style="width:100px;margin-bottom:10px;">Tambah Siswa</button></div>`)
+		$('.gruparea').html(`<div class="biogrup float-left" ><span style="font-size:2em;font-weight:bold;">${namagrup}</span> <i style="cursor:pointer;font-size:1em;" class="f7-icons editnamagrup">pencil_circle</i></div><div class="float-right"><button class="button button-fill siswabaru" style="margin-bottom:10px;">Tambah Siswa</button></div>`)
 		
 		$('.siswabaru').on('click',()=>{
 			siswaBaru(grupid)
@@ -885,12 +885,14 @@ const grupContent = async (data) => {
 	console.log(data)
 	let siswaarr = JSON.parse(data[3])
 	
-	let html = `<div style="clear:both;" class="data-table data-table-collapsible data-table-init siswa"><table><thead><tr><th>Nama</th><th>Jenis Kelamin</th><th>Tempat Tanggal Lahir</th><th>Nomer HP</th><th>Alamat Asal</th><th>Alamat Domisili</th><th>Lulusan SMA</th><th>Status Orang Tua</th><th>Program Studi</th><th>Fakultas</th><th>Tahun Masuk Unair</th><th>Level Pembinaan</th><th>Tahun Masuk Mulai Pembinaan / Mentoring</th><th>Materi yang Sudah Disampaikan</th><th>Kegiatan yang Sudah Diikuti</th><th>Keterangan</th><th>Catatan</th><th></th></tr></thead><tbody>`
+	let html = `<div style="clear:both;" class="data-table data-table-collapsible data-table-init siswa"><table><thead><tr><th>No.</th><th>Nama</th><th>Jenis Kelamin</th><th>Tempat Tanggal Lahir</th><th>Nomer HP</th><th>Alamat Asal</th><th>Alamat Domisili</th><th>Lulusan SMA</th><th>Status Orang Tua</th><th>Program Studi</th><th>Fakultas</th><th>Tahun Masuk Unair</th><th>Level Pembinaan</th><th>Tahun Masuk Mulai Pembinaan / Mentoring</th><th>Materi yang Sudah Disampaikan</th><th>Kegiatan yang Sudah Diikuti</th><th>Keterangan</th><th>Catatan</th><th></th></tr></thead><tbody>`
 	
 	for (var i=0;i<siswaarr.length;i++){
 		let siswa = siswaarr[i]
+		let nomor = i+1
 		html += `
 			<tr>
+				<td data-collapsible-title="No.">${safe(nomor)}</td>
 				<td data-collapsible-title="Nama">${safe(siswa.nama)}</td>
 				<td data-collapsible-title="Jenis Kelamin">${safe(siswa.jeniskelamin)}</td>
 				<td data-collapsible-title="Tempat Tanggal Lahir">${safe(siswa.tempattanggallahir)}</td>
