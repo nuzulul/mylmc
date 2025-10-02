@@ -426,7 +426,7 @@ const existUser = async (user) => {
 	
 	for(const grup of gruparr){
 		html += `
-			<button class="button button-fill bukagrup bg-color-green float-left" data-grupid="${grup.grupid}" data-namagrup="${grup.namagrup}" style="width:100px;height:100px;margin-bottom:5px;margin-right:5px;"><span style="font-size:0.7em;display:none">${grup.grupid}</span>${grup.namagrup}</button>
+			<button class="button button-fill bukagrup bg-color-green float-left" data-grupid="${grup.grupid}" data-namagrup="${grup.namagrup}" style="width:auto;min-width:100px;height:100px;margin-bottom:5px;margin-right:5px;"><span style="font-size:0.7em;display:none">${grup.grupid}</span>${grup.namagrup}</button>
 	`
 	}
 	
@@ -455,7 +455,7 @@ const existUser = async (user) => {
 
 const grupPage = async (grupid,namagrup) => {
 	
-		$('.gruparea').html(`<div class="biogrup float-left" ><span style="font-size:2em;font-weight:bold;">${namagrup}</span> <i style="cursor:pointer;font-size:1em;" class="f7-icons editnamagrup">pencil_circle</i></div><div class="float-right"><button class="button button-fill siswabaru" style="margin-bottom:10px;">Tambah Siswa</button></div>`)
+		$('.gruparea').html(`<div class="biogrup float-left" ><span style="font-size:2em;font-weight:bold;">${namagrup}</span> <i style="cursor:pointer;font-size:1em;" class="f7-icons editnamagrup">pencil_circle</i></div><div class="float-right"><button class="button button-fill siswabaru" style="margin-bottom:10px;">Tambah Siswa</button></div><div style="width:100%;clear:both;"></div>`)
 		
 		$('.siswabaru').on('click',()=>{
 			siswaBaru(grupid)
