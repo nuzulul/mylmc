@@ -16,21 +16,32 @@ var params = getParams(window.location.href);
 var auth0redirect = "https://hook8080.instatunnel.my" //dev
 var isLocal = false;
 var userToken = ""
+var DEBUG = true;
 
 if (window.location.href.indexOf("https://mylmc.press.my.id") > -1)
 {
   var apidataurl = "https://script.google.com/macros/s/AKfycby93nU7-7uxh2p8TaVkRy8GpBayRd6zbY0W-ETGmmTuqSrg49Wud3Ityrt5MCcTCl_Ntg/exec";
   auth0redirect = "https://mylmc.press.my.id"
+  DEBUG = false;
 }
 else
 {
   console.log('local development');
   isLocal = true;
+  DEBUG = true;
   var access_token = '';
   if(localStorage.hasOwnProperty('dev')){
 	  access_token = atob(localStorage.getItem('dev'))
   }
   var apidataurl = "https://script.google.com/macros/s/AKfycbwhzr7l6s7MxYN3nYemIH91nuxsWvKHdOxIdfIqiIae/dev?access_token="+access_token;
+}
+
+if(!DEBUG){
+    if(!window.console) window.console = {};
+    var methods = ["log", "debug", "warn", "info"];
+    for(var i=0;i<methods.length;i++){
+        console[methods[i]] = function(){};
+    }
 }
 
 
