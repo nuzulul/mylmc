@@ -15,7 +15,7 @@
   ],
   "icons": [
       {
-          "src": "/assets/icon/512x512.png",
+          "src": "/assets/icons/512x512.png",
           "sizes": "512x512",
           "type": "image/png",
           "purpose": "any"
@@ -50,7 +50,7 @@
   },  
   "screenshots" : [
     {
-      "src": "/assets/icon/logo.png",
+      "src": "/assets/icons/logo.png",
       "sizes": "1080x1080",
       "type": "image/png",
       "platform": "wide"

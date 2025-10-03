@@ -430,9 +430,9 @@ const existUser = async (user) => {
 	
 	let html = `
 		<div class="block-title">
-			Selamat datang, 
+			Selamat datang 
 			<div style="width:fit-content;display:flex;border: 1px solid blue;padding: 5px;border-radius: 5px;margin-top: 5px;">
-				<div style="width:fit-content"><img src="${info.picture}" style="margin-right: 5px;border-radius: 25px;width:25px;height:25px;object-fit: contain;"></div>
+				<div style="width:fit-content"><img src="${info.picture}" style="margin-right: 5px;border-radius: 25px;width:30px;height:30px;object-fit: contain;"></div>
 				<div style="width:fit-content">${info.name}<br>${user[2]}</div>
 			</div>
 		</div>
