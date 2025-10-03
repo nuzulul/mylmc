@@ -1,0 +1,59 @@
+{
+  "id": "MyLMC",
+  "background_color": "#ffffff",
+  "description": "Lingkar Muda Cendekia",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "MyLMC",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "MyLMC",
+  "start_url": "/",
+  "theme_color": "#646cff",
+  "categories": [
+    "social"
+  ],
+  "icons": [
+      {
+          "src": "/assets/icon/512x512.png",
+          "sizes": "512x512",
+          "type": "image/png",
+          "purpose": "any"
+      }
+  ],
+  "capture_links": "existing-client-navigate",
+  "url_handlers": [
+    {
+      "origin": "https://mylmc.press.my.id"
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+mylmc",
+      "url": "/?mylmc=%s"
+    }
+  ],
+  "intent_filters": [
+    {
+      "scope_url_scheme": "https",
+      "scope_url_host": "mylmc.press.my.id",
+      "scope_url_path": "/"
+    }
+  ],
+  "related_applications": [{
+    "platform": "webapp",
+    "url": "https://mylmc.press.my.id/manifest.json"
+  }],
+  "lang": "id",
+  "launch_handler": {
+      "client_mode": ["navigate-new", "auto"]
+  },  
+  "screenshots" : [
+    {
+      "src": "/assets/icon/logo.png",
+      "sizes": "1080x1080",
+      "type": "image/png",
+      "platform": "wide"
+    }
+  ]
+}
