@@ -817,17 +817,19 @@ const siswaBaru = async (grupid,edit,idx) => {
 				var catatan = $('#catatan').val();
 				
 				if(edit){
-					
-					let siswa = {nama,jeniskelamin,tempattanggallahir,nomerhp,alamatasal,alamatdomisili,lulusansma,statusortu,programstudi,fakultas,tahunmasukunair,levelpembinaan,tahunmulaipembinaan,materi,kegiatan,keterangan,catatan}
-					let siswaarr = JSON.parse(datagrup[3])
+					let siswaarr = JSON.parse(window.datagrup[3])
+					let siswacurrent = siswaarr[parseInt(idx)]
+					let info = siswacurrent.info
+					let siswa = {nama,jeniskelamin,tempattanggallahir,nomerhp,alamatasal,alamatdomisili,lulusansma,statusortu,programstudi,fakultas,tahunmasukunair,levelpembinaan,tahunmulaipembinaan,materi,kegiatan,keterangan,catatan,info}
+					//let siswaarr = JSON.parse(datagrup[3])
 					siswaarr[parseInt(idx)] = siswa
-					grupSave(mygrupid,JSON.stringify(siswaarr))
+					grupSave(mygrupid,siswaarr)
 				}else{
 					let siswa = {nama,jeniskelamin,tempattanggallahir,nomerhp,alamatasal,alamatdomisili,lulusansma,statusortu,programstudi,fakultas,tahunmasukunair,levelpembinaan,tahunmulaipembinaan,materi,kegiatan,keterangan,catatan}
 					if (window.datagrup && window.datagrup !== '' && window.datagrup[1] === mygrupid){
 						let siswaarr = JSON.parse(window.datagrup[3])
 						siswaarr.push(siswa)
-						grupSave(mygrupid,JSON.stringify(siswaarr))
+						grupSave(mygrupid,siswaarr)
 					}
 				}
           }
