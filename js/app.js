@@ -44,6 +44,31 @@ if(!DEBUG){
     }
 }
 
+const dynamicPage = (title = 'MyLMC') => {
+	let html = `
+		<div class="page">
+		  <div class="navbar">
+			<div class="navbar-bg"></div>
+			<div class="navbar-inner sliding">
+			  <div class="left">
+				<a href="/" class="link">
+				  <i class="icon icon-back"></i>
+				  <span class="if-not-md">Back</span>
+				</a>
+			  </div>
+			  <div class="title">${title}</div>
+			</div>
+		  </div>
+		  <div class="page-content">
+			<div class="block block-strong inset dynamicarea">
+			  
+			</div>
+		  </div>
+		</div>
+	`
+	return html
+}
+
 
 //////////////////app////////////////////////////////////////
 
@@ -462,9 +487,7 @@ const existUser = async (user) => {
 	$('.bukagrup').on('click',async (e)=>{
 		let grupid = e.srcElement.dataset.grupid
 		let namagrup = e.srcElement.dataset.namagrup
-		console.log()
-		const res = await fetch("/pages/grup.html")      
-		var statushtml = await res.text()
+		var statushtml = dynamicPage('Kelas')
 		app.views.main.router.navigate({url:"/dynamicLoad/", route:{content:statushtml}});
 		grupPage(grupid,namagrup)
 	})	
@@ -474,7 +497,7 @@ const existUser = async (user) => {
 
 const grupPage = async (grupid,namagrup) => {
 	
-		$('.gruparea').html(`<div class="biogrup float-left" ><span style="font-size:2em;font-weight:bold;">${namagrup}</span> <i style="cursor:pointer;font-size:1em;" class="f7-icons editnamagrup">pencil_circle</i></div><div class="float-right"><button class="button button-fill siswabaru" style="margin-bottom:10px;">Tambah Siswa</button></div><div style="width:100%;clear:both;"></div>`)
+		$('.dynamicarea').html(`<div class="biogrup float-left" ><span style="font-size:2em;font-weight:bold;">${namagrup}</span> <i style="cursor:pointer;font-size:1em;" class="f7-icons editnamagrup">pencil_circle</i></div><div class="float-right"><button class="button button-fill siswabaru" style="margin-bottom:10px;">Tambah Siswa</button></div><div style="width:100%;clear:both;"></div>`)
 		
 		$('.siswabaru').on('click',()=>{
 			siswaBaru(grupid)
@@ -938,7 +961,7 @@ const grupContent = async (data) => {
 	
 	html += `</tbody></table></div>`
 	
-	$('.gruparea').append(html)
+	$('.dynamicarea').append(html)
 	
 	$('.updatesiswa').on('click',async (e)=>{
 		let idx = e.srcElement.dataset.idx
