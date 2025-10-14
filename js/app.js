@@ -13,10 +13,12 @@ var getParams = function (url) {
 };
 var params = getParams(window.location.href);
 
-var auth0redirect = "https://hook8080.instatunnel.my" //dev
+//var auth0redirect = "https://hook8080.instatunnel.my" //dev
+var auth0redirect = "http://localhost:8080/" //dev
 var isLocal = false;
 var userToken = ""
 var DEBUG = true;
+var skipuserid = ['mg76ysv6']
 
 if (window.location.href.indexOf("https://mylmc.press.my.id") > -1)
 {
@@ -44,7 +46,7 @@ if(!DEBUG){
     }
 }
 
-const dynamicPage = (title = 'MyLMC') => {
+const dynamicLoad = (title = 'MyLMC') => {
 	let html = `
 		<div class="page">
 		  <div class="navbar">
@@ -427,9 +429,9 @@ const sendInvite = async (invite) => {
 			if (status == "success")
 			{
 				console.log(data);
-				mypreloader.close();
 				$('.mainarea').html('')
-				existUser(data)
+				existUser(data.user)
+				userToken = data.accessToken
 			}
 			else if (status == "failed")
 			{
@@ -487,7 +489,7 @@ const existUser = async (user) => {
 	$('.bukagrup').on('click',async (e)=>{
 		let grupid = e.srcElement.dataset.grupid
 		let namagrup = e.srcElement.dataset.namagrup
-		var statushtml = dynamicPage('Kelas')
+		var statushtml = dynamicLoad('Kelas')
 		app.views.main.router.navigate({url:"/dynamicLoad/", route:{content:statushtml}});
 		grupPage(grupid,namagrup)
 	})	
@@ -933,6 +935,8 @@ const grupContent = async (data) => {
 	
 	for (var i=0;i<siswaarr.length;i++){
 		let siswa = siswaarr[i]
+		let info = siswa.info
+		if(!info.aktif)continue
 		let nomor = i+1
 		html += `
 			<tr>
@@ -1045,4 +1049,108 @@ unsafe = String(unsafe);
 var data = escapehtmloldbrowser(unsafe);
 return data;
 
+}
+
+
+
+const dynamicPage = (pageId)=>{
+	console.log('pageId',pageId)
+	let page = pageId
+	switch (pageId) {
+		case 'Database':
+			pageDatabase()
+			break
+		default:
+			console.log('ok')
+	}
+}
+
+
+const pageDatabase = ()=>{
+	
+	if (typeof window.admindata === 'undefined' || window.admindata === null)
+	{
+
+		let mypreloader = app.dialog.preloader();
+		
+		const input = {userToken}
+		
+		const data = new URLSearchParams({
+            command: 'admindata',
+			input : JSON.stringify(input)
+        })		
+		
+		fetch(apidataurl, {
+			body: data,
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+			method: "post",
+		})
+		.then(function (response) {
+			if (response.ok) {
+				return response.text();
+			} else {
+				return Promise.reject(response);
+			}
+		}).then(function (data) {
+			mypreloader.close();
+			console.log(data)
+			var status = JSON.parse(data).status;
+			var data = JSON.parse(data).data;
+			if (status == "success")
+			{
+				console.log(data);
+				if(isLocal){
+					let skipgrupid = []
+					for(const id of skipuserid){
+						const idx = data.users.findIndex((user)=>user[1]===id)
+						if (idx !== -1){
+							const usergrup = JSON.parse(data.users[idx][5])
+							for(const grup of usergrup){
+								skipgrupid.push(grup.grupid)
+							}
+							data.users.splice(idx, 1);
+						}
+					}
+					for(const id of skipgrupid){
+						const idx = data.grups.findIndex((grup)=>grup[1]===id)
+						if (idx !== -1){
+							data.grups.splice(idx, 1);
+						}
+					}
+					
+				}
+				data.users.splice(0, 1) //remove label
+				data.grups.splice(0, 1) //remove label
+				window.admindata = data
+				pageDatabaseContent(window.admindata)
+			}
+			else if (status == "failed")
+			{
+			  app.dialog.alert(data,'Terjadi Kesalahan');
+			}
+			else
+			{
+			  app.dialog.alert(data,'Terjadi Kesalahan');
+			}		
+		}).catch(function (err) {
+			console.warn('Something went wrong.', err);
+			mypreloader.close();
+		});		  
+
+	}
+	else
+	{
+		pageDatabaseContent(window.admindata)
+	}
+
+	/*$$('.refresh').on('click', function () {
+	admindata = null
+	pageDatabase()
+	})	*/
+}
+
+const pageDatabaseContent = (admindata)=>{
+	console.log('admindata',admindata)
 }

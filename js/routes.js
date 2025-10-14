@@ -4,7 +4,7 @@ var routes = [
     path: '/',
     url: './index.html',
 	on: {
-		pageAfterIn: function test (e, page) {
+		pageAfterIn: function (e, page) {
 			console.log('entry')
 			if (window.datauser){
 				existUser(window.datauser)
@@ -17,6 +17,17 @@ var routes = [
     path: "/dynamicLoad/"
 
   },  
+  {
+    name: "dynamicPage",
+    path: "/dynamicPage/:pageId/",
+	componentUrl: './pages/dynamic-page.html',
+	on: {
+		pageAfterIn: function (e, page) {
+			console.log(page.route.params.pageId)
+			dynamicPage(page.route.params.pageId)
+		}
+	}	
+  },   
   {
     path: '/about/',
     url: './pages/about.html',
